@@ -14,6 +14,11 @@ export interface Product {
   description: string;
 }
 
+export interface CartItem {
+  product: Product;
+  quantity: number;
+}
+
 export interface Order {
   id: string;
   date: string;
@@ -32,11 +37,4 @@ export interface User {
   name: string;
   email: string;
   role: 'Customer' | 'Merchant' | 'Admin';
-}
-
-export interface AnalyticsData {
-  totalSales: number;
-  totalOrders: number;
-  activeProducts: number;
-  totalVendors?: number;
 }
