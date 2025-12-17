@@ -1,10 +1,15 @@
 
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Star, ShieldCheck, Truck, RefreshCw, ShoppingCart, Zap } from 'lucide-react';
+import { Star, ShieldCheck, Truck, ShoppingCart, Zap, Store } from 'lucide-react';
 import { MOCK_PRODUCTS } from '../constants';
+import { Product } from '../types';
 
-const ProductDetails: React.FC<{ addToCart: () => void }> = ({ addToCart }) => {
+interface ProductDetailsProps {
+  addToCart: (product: Product) => void;
+}
+
+const ProductDetails: React.FC<ProductDetailsProps> = ({ addToCart }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const product = MOCK_PRODUCTS.find(p => p.id === id) || MOCK_PRODUCTS[0];
@@ -29,13 +34,18 @@ const ProductDetails: React.FC<{ addToCart: () => void }> = ({ addToCart }) => {
         {/* معلومات المنتج */}
         <div className="lg:w-1/2 flex flex-col">
           <nav className="text-xs text-blue-600 font-bold mb-4 flex gap-2">
-            <span className="cursor-pointer hover:underline">الرئيسية</span> / 
+            <span className="cursor-pointer hover:underline" onClick={() => navigate('/')}>الرئيسية</span> / 
             <span className="cursor-pointer hover:underline">{product.category}</span> / 
-            <span className="text-gray-400">{product.name}</span>
+            <span className="text-gray-400 line-clamp-1">{product.name}</span>
           </nav>
           
           <h1 className="text-3xl font-black mb-2 leading-tight">{product.name}</h1>
-          <p className="text-blue-600 font-bold mb-4 cursor-pointer hover:underline">الماركة: {product.vendor}</p>
+          <div 
+            className="text-blue-600 font-bold mb-4 cursor-pointer hover:underline flex items-center gap-1"
+            onClick={() => navigate(`/vendor/${product.vendor}`)}
+          >
+            <Store size={16} /> الماركة: {product.vendor}
+          </div>
           
           <div className="flex items-center gap-2 mb-6 border-b pb-6">
             <div className="flex text-orange-400">
@@ -52,8 +62,7 @@ const ProductDetails: React.FC<{ addToCart: () => void }> = ({ addToCart }) => {
                 <span className="text-4xl font-black">{product.price.toLocaleString()}</span>
                 <span className="text-lg font-bold">جنية</span>
              </div>
-             <p className="text-sm text-gray-500 font-bold mt-1">السعر المعتاد: <span className="line-through">{(product.price * 1.25).toLocaleString()} جنية</span></p>
-             <p className="text-xs text-gray-400 mt-2">الأسعار تشمل ضريبة القيمة المضافة.</p>
+             <p className="text-sm text-gray-500 font-bold mt-1">السعر المعتاد: <span className="line-through">{(product.price * 1.25).toLocaleString()} ج.م</span></p>
           </div>
 
           <div className="space-y-6 mb-8 bg-gray-50 p-6 rounded-2xl border border-dashed border-gray-200">
@@ -68,20 +77,20 @@ const ProductDetails: React.FC<{ addToCart: () => void }> = ({ addToCart }) => {
                <div className="p-2 bg-white rounded-full text-green-600 shadow-sm"><Truck /></div>
                <div>
                   <p className="text-sm font-black">شحن مجاني</p>
-                  <p className="text-xs text-gray-500">توصيل غداً إذا طلبت خلال 3 ساعات</p>
+                  <p className="text-xs text-gray-500">توصيل غداً إذا طلبت الآن</p>
                </div>
             </div>
           </div>
 
           <div className="mt-auto space-y-4">
             <button 
-              onClick={() => { addToCart(); navigate('/cart'); }}
+              onClick={() => { addToCart(product); navigate('/cart'); }}
               className="w-full amazon-orange amazon-orange-hover py-5 rounded-2xl font-black text-xl shadow-xl flex items-center justify-center gap-3 transition-transform active:scale-95"
             >
               <ShoppingCart /> أضف للسلة الآن
             </button>
             <button 
-              onClick={() => navigate('/checkout')}
+              onClick={() => { addToCart(product); navigate('/checkout'); }}
               className="w-full bg-blue-900 text-white py-5 rounded-2xl font-black text-xl shadow-xl flex items-center justify-center gap-3 hover:bg-blue-800 transition-all"
             >
               <Zap fill="currentColor" /> شراء الآن

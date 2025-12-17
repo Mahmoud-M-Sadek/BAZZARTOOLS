@@ -1,9 +1,13 @@
 
 import React from 'react';
-import { Package, MapPin, CreditCard, Settings, User, Clock, ChevronLeft } from 'lucide-react';
-import { MOCK_ORDERS } from '../../constants';
+import { Package, MapPin, Settings, User, CreditCard, Clock, ChevronLeft, Truck } from 'lucide-react';
+import { Order } from '../../types';
 
-const CustomerDashboard: React.FC = () => {
+interface CustomerDashboardProps {
+  orders: Order[];
+}
+
+const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ orders }) => {
   const translateStatus = (status: string) => {
     switch(status) {
       case 'Delivered': return 'تم التوصيل';
@@ -15,139 +19,85 @@ const CustomerDashboard: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 text-right">
-      <h1 className="text-3xl font-bold amazon-text-blue mb-8">حسابك</h1>
+      <div className="flex items-center gap-4 mb-8">
+        <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+          <User size={32} />
+        </div>
+        <div>
+          <h1 className="text-3xl font-black amazon-text-blue">مرحباً، محمود صادق</h1>
+          <p className="text-gray-500 font-bold">عضو منذ أكتوبر 2023</p>
+        </div>
+      </div>
       
-      {/* شبكة الإجراءات السريعة */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <div className="bg-white p-6 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-4">
-          <div className="text-blue-600"><Package size={32} /></div>
-          <div>
-            <h3 className="font-bold text-lg">طلباتك</h3>
-            <p className="text-sm text-gray-600">تتبع، إرجاع، أو إعادة شراء المنتجات</p>
-          </div>
+        <div className="bg-white p-6 border rounded-2xl hover:shadow-md transition-all cursor-pointer flex items-center gap-4">
+          <div className="p-3 bg-blue-50 text-blue-600 rounded-xl"><Package size={24} /></div>
+          <div><h3 className="font-black">طلباتي</h3><p className="text-xs text-gray-400">تتبع مشترياتك</p></div>
         </div>
-        <div className="bg-white p-6 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-4">
-          <div className="text-blue-600"><Settings size={32} /></div>
-          <div>
-            <h3 className="font-bold text-lg">الأمان والخصوصية</h3>
-            <p className="text-sm text-gray-600">تعديل بيانات الدخول والاسم والهاتف</p>
-          </div>
+        <div className="bg-white p-6 border rounded-2xl hover:shadow-md transition-all cursor-pointer flex items-center gap-4">
+          <div className="p-3 bg-orange-50 text-orange-600 rounded-xl"><MapPin size={24} /></div>
+          <div><h3 className="font-black">عناويني</h3><p className="text-xs text-gray-400">إدارة مواقع الشحن</p></div>
         </div>
-        <div className="bg-white p-6 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-4">
-          <div className="text-blue-600"><MapPin size={32} /></div>
-          <div>
-            <h3 className="font-bold text-lg">عناوينك</h3>
-            <p className="text-sm text-gray-600">تعديل عناوين الشحن المفضلة</p>
-          </div>
+        <div className="bg-white p-6 border rounded-2xl hover:shadow-md transition-all cursor-pointer flex items-center gap-4">
+          <div className="p-3 bg-purple-50 text-purple-600 rounded-xl"><Settings size={24} /></div>
+          <div><h3 className="font-black">الإعدادات</h3><p className="text-xs text-gray-400">تعديل ملفك الشخصي</p></div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* قائمة الطلبات الأخيرة */}
-        <div className="lg:col-span-2">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold">الطلبات الأخيرة</h2>
-            <button className="text-blue-600 text-sm hover:underline font-medium">عرض جميع الطلبات</button>
-          </div>
-          
-          <div className="space-y-4">
-            {MOCK_ORDERS.map(order => (
-              <div key={order.id} className="bg-white border rounded-lg overflow-hidden shadow-sm">
-                <div className="bg-gray-100 p-4 flex flex-wrap gap-4 justify-between items-center text-sm border-b">
-                  <div className="flex gap-8">
-                    <div>
-                      <p className="text-gray-500 uppercase text-xs">تاريخ الطلب</p>
-                      <p className="font-medium">{order.date}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 uppercase text-xs">الإجمالي</p>
-                      <p className="font-medium">{order.total.toLocaleString()} ج.م</p>
-                    </div>
-                  </div>
-                  <div className="text-left">
-                    <p className="text-gray-500 uppercase text-xs">رقم الطلب # {order.id}</p>
-                    <div className="flex gap-3 mt-1">
-                      <button className="text-blue-600 hover:underline">التفاصيل</button>
-                      <span className="text-gray-300">|</span>
-                      <button className="text-blue-600 hover:underline">الفاتورة</button>
-                    </div>
-                  </div>
-                </div>
-                <div className="p-4 flex flex-col md:flex-row gap-6">
-                  <div className="flex-grow">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-                        order.status === 'Delivered' ? 'bg-green-100 text-green-700' : 
-                        order.status === 'Shipped' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
-                      }`}>
+        <div className="lg:col-span-2 space-y-6">
+          <h2 className="text-2xl font-black mb-4">طلباتك الأخيرة</h2>
+          {orders.length === 0 ? (
+            <div className="bg-white p-12 text-center rounded-2xl border border-dashed">
+               <p className="text-gray-400 font-bold">لا يوجد طلبات حالية.</p>
+            </div>
+          ) : (
+            orders.map(order => (
+              <div key={order.id} className="bg-white border rounded-2xl overflow-hidden shadow-sm">
+                <div className="bg-gray-50 p-4 border-b flex justify-between items-center flex-wrap gap-4">
+                  <div className="flex gap-8 text-sm font-bold">
+                    <div><p className="text-gray-400 text-[10px] mb-1">تاريخ الطلب</p><p>{order.date}</p></div>
+                    <div><p className="text-gray-400 text-[10px] mb-1">الإجمالي</p><p>{order.total.toLocaleString()} ج.م</p></div>
+                    <div><p className="text-gray-400 text-[10px] mb-1">الحالة</p>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${order.status === 'Processing' ? 'bg-orange-100 text-orange-600' : 'bg-green-100 text-green-600'}`}>
                         {translateStatus(order.status)}
                       </span>
-                      <span className="text-gray-500 text-sm">•</span>
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded bg-gray-200 text-gray-800`}>
-                        {order.fulfillment === 'Bazaar' ? 'بواسطة بازار' : 'شحن التاجر'}
-                      </span>
                     </div>
-                    {order.items.map((item, idx) => (
-                      <div key={idx} className="flex gap-4 items-center mb-3">
-                        <img src={item.image} alt={item.name} className="w-16 h-16 rounded border object-cover" />
-                        <div>
-                          <p className="font-bold text-blue-600 hover:underline cursor-pointer">{item.name}</p>
-                          <p className="text-sm text-gray-500">الكمية: {item.quantity}</p>
-                        </div>
+                  </div>
+                  <p className="text-blue-600 font-black">رقم الطلب {order.id}</p>
+                </div>
+                <div className="p-6">
+                  {order.items.map((item, idx) => (
+                    <div key={idx} className="flex gap-4 items-center mb-4 last:mb-0">
+                      <img src={item.image} className="w-16 h-16 rounded-xl border object-contain mix-blend-multiply" />
+                      <div className="flex-grow">
+                        <p className="font-black text-sm">{item.name}</p>
+                        <p className="text-xs text-gray-500">الكمية: {item.quantity}</p>
                       </div>
-                    ))}
-                  </div>
-                  <div className="flex flex-col gap-2 min-w-[200px]">
-                    <button className="amazon-orange amazon-orange-hover py-2 rounded-md shadow text-sm font-medium">تتبع الشحنة</button>
-                    <button className="bg-white border hover:bg-gray-50 py-2 rounded-md shadow-sm text-sm font-medium">إرجاع المنتجات</button>
-                    <button className="bg-white border hover:bg-gray-50 py-2 rounded-md shadow-sm text-sm font-medium">تقييم المنتج</button>
-                  </div>
+                      <button className="bg-orange-50 text-orange-600 px-4 py-2 rounded-xl text-xs font-black">شراء مرة أخرى</button>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
-          </div>
+            ))
+          )}
         </div>
 
-        {/* معلومات الملف الشخصي */}
         <div className="space-y-6">
-          <div className="bg-white border rounded-lg p-6">
-            <h2 className="text-xl font-bold mb-4">العناوين المحفوظة</h2>
-            <div className="space-y-4">
-              <div className="border rounded p-3 relative group">
-                <span className="absolute top-3 left-3 text-xs bg-gray-100 px-2 py-0.5 rounded text-gray-600">افتراضي</span>
-                <p className="font-bold">المنزل</p>
-                <p className="text-sm text-gray-600">محمود صادق</p>
-                <p className="text-sm text-gray-600">شارع المعز، عمارة 4ب</p>
-                <p className="text-sm text-gray-600">القاهرة، 11511</p>
-                <p className="text-sm text-gray-600">جمهورية مصر العربية</p>
-                <p className="text-sm text-gray-600" dir="ltr">Phone: +201030417663</p>
-                <div className="mt-2 flex gap-3 text-sm text-blue-600">
-                  <button className="hover:underline">تعديل</button>
-                  <button className="hover:underline text-red-500">حذف</button>
-                </div>
-              </div>
-              <button className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-blue-500 hover:text-blue-500 transition-colors text-sm font-medium">
-                + إضافة عنوان جديد
-              </button>
-            </div>
+          <div className="bg-white border rounded-2xl p-6 shadow-sm">
+             <h3 className="font-black mb-4 border-b pb-3">العنوان الافتراضي</h3>
+             <div className="text-sm font-bold space-y-1">
+                <p>محمود صادق</p>
+                <p className="text-gray-500">شارع المعز، برج الياسمين</p>
+                <p className="text-gray-500">القاهرة، مصر</p>
+                <p className="text-blue-600 pt-2 cursor-pointer hover:underline">تعديل العنوان</p>
+             </div>
           </div>
-
-          <div className="bg-white border rounded-lg p-6">
-            <h2 className="text-xl font-bold mb-4">تفضيلات الحساب</h2>
-            <ul className="space-y-4">
-              <li className="flex items-center justify-between text-sm cursor-pointer hover:text-blue-600">
-                <span className="flex items-center gap-2"><CreditCard size={18} className="text-gray-400" /> طرق الدفع</span>
-                <ChevronLeft size={16} className="text-gray-300" />
-              </li>
-              <li className="flex items-center justify-between text-sm cursor-pointer hover:text-blue-600">
-                <span className="flex items-center gap-2"><Clock size={18} className="text-gray-400" /> سجل التصفح</span>
-                <ChevronLeft size={16} className="text-gray-300" />
-              </li>
-              <li className="flex items-center justify-between text-sm cursor-pointer hover:text-blue-600">
-                <span className="flex items-center gap-2"><User size={18} className="text-gray-400" /> إعدادات الملف الشخصي</span>
-                <ChevronLeft size={16} className="text-gray-300" />
-              </li>
-            </ul>
+          <div className="bg-blue-900 text-white p-6 rounded-2xl shadow-xl">
+             <Truck className="mb-4 text-orange-400" size={32} />
+             <h3 className="font-black mb-2">اشترك في بازار بريميم</h3>
+             <p className="text-xs text-blue-200 mb-6 leading-relaxed">احصل على شحن مجاني غير محدود وتوصيل في نفس اليوم لآلاف المنتجات.</p>
+             <button className="w-full amazon-orange text-black py-3 rounded-xl font-black text-sm">جرب مجاناً لمدة شهر</button>
           </div>
         </div>
       </div>

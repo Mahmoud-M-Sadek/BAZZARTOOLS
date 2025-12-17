@@ -1,14 +1,14 @@
 
 import React from 'react';
-import { ShoppingCart, Search, User, Menu, MapPin, ChevronDown, MessageCircle, Instagram, Facebook, Twitter, Phone, Globe, LogOut } from 'lucide-react';
+import { ShoppingCart, Search, User, Menu, MapPin, ChevronDown, MessageCircle, Instagram, Facebook, Twitter, LogOut, LogIn } from 'lucide-react';
 import { CATEGORIES } from '../constants';
 import { User as UserType } from '../types';
 import { useNavigate } from 'react-router-dom';
 
 interface LayoutProps {
   children: React.ReactNode;
-  user: UserType;
-  setUser: (user: UserType) => void;
+  user: UserType | null;
+  setUser: (user: UserType | null) => void;
   cartCount: number;
   onSearch: (query: string) => void;
   onCategoryChange: (cat: string) => void;
@@ -36,9 +36,8 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser, cartCount, onS
             </div>
           </div>
 
-          {/* Search Bar Linked */}
-          <div className="flex-grow flex bg-white rounded-md overflow-hidden group focus-within:ring-2 focus-within:ring-orange-500 h-10">
-            <div className="relative">
+          <div className="flex-grow flex bg-white rounded-md overflow-hidden h-10">
+            <div className="relative hidden md:block">
               <select 
                 className="bg-gray-100 text-gray-700 px-3 py-2 text-xs border-l border-gray-300 focus:outline-none appearance-none pr-3 pl-7 cursor-pointer hover:bg-gray-200 h-full font-bold"
                 value={selectedCategory}
@@ -60,35 +59,50 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser, cartCount, onS
                 navigate('/');
               }}
             />
-            <button className="amazon-orange amazon-orange-hover p-2 text-gray-900 px-5 transition-colors">
+            <button className="amazon-orange amazon-orange-hover p-2 text-gray-900 px-5">
               <Search size={20} />
             </button>
           </div>
 
-          <div className="relative group cursor-pointer hover:ring-1 hover:ring-white p-1 min-w-max hidden md:block rounded">
-            <div className="flex flex-col text-sm items-start">
-              <span className="text-xs text-gray-400 font-bold">مرحباً، {user.name}</span>
-              <span className="font-bold flex items-center">الحساب والقوائم <ChevronDown size={14} className="mr-1 text-gray-400" /></span>
-            </div>
+          <div className="relative group cursor-pointer hover:ring-1 hover:ring-white p-1 min-w-max rounded">
+            {!user ? (
+              <div onClick={() => navigate('/auth')} className="flex flex-col text-sm items-start">
+                <span className="text-xs text-gray-400 font-bold">مرحباً، سجل الدخول</span>
+                <span className="font-bold flex items-center">الحساب <LogIn size={14} className="mr-1" /></span>
+              </div>
+            ) : (
+              <div className="flex flex-col text-sm items-start">
+                <span className="text-xs text-gray-400 font-bold">مرحباً، {user.name.split(' ')[0]}</span>
+                <span className="font-bold flex items-center">الحساب والقوائم <ChevronDown size={14} className="mr-1" /></span>
+              </div>
+            )}
             
-            <div className="absolute left-0 top-full mt-1 w-64 bg-white text-gray-900 shadow-2xl rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 border border-gray-200 p-4 transform origin-top">
-              <div className="mb-3 p-2 bg-gray-50 rounded text-center">
-                <p className="text-xs font-bold text-blue-600">أنت مسجل كـ: {user.role === 'Admin' ? 'مدير' : user.role === 'Merchant' ? 'تاجر' : 'عميل'}</p>
-              </div>
-              <div className="grid grid-cols-2 gap-4 text-xs">
-                <div className="space-y-2">
-                  <p className="font-extrabold border-b pb-1">حسابك</p>
-                  <p className="hover:text-orange-600 cursor-pointer" onClick={() => navigate('/dashboard')}>الملف الشخصي</p>
-                  <p className="hover:text-orange-600 cursor-pointer" onClick={() => navigate('/orders')}>طلباتك</p>
+            {user && (
+              <div className="absolute left-0 top-full mt-1 w-64 bg-white text-gray-900 shadow-2xl rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 border border-gray-200 p-4 transform origin-top">
+                <div className="mb-4 p-2 bg-blue-50 rounded text-center">
+                  <p className="text-xs font-black text-blue-900">أنت بوضع {user.role === 'Admin' ? 'المدير' : user.role === 'Merchant' ? 'التاجر' : 'العميل'}</p>
                 </div>
-                <div className="space-y-2">
-                  <p className="font-extrabold border-b pb-1">الصلاحيات</p>
-                  <button onClick={() => setUser({...user, role: 'Customer'})} className="block hover:text-orange-600">عميل</button>
-                  <button onClick={() => setUser({...user, role: 'Merchant'})} className="block hover:text-orange-600">تاجر</button>
-                  <button onClick={() => setUser({...user, role: 'Admin'})} className="block hover:text-orange-600">مدير</button>
+                <div className="grid grid-cols-2 gap-4 text-xs font-bold">
+                  <div className="space-y-3">
+                    <p className="text-orange-600 border-b pb-1">لوحة التحكم</p>
+                    <p className="hover:text-blue-600 cursor-pointer" onClick={() => navigate('/dashboard')}>الملف الشخصي</p>
+                    <p className="hover:text-blue-600 cursor-pointer" onClick={() => navigate('/orders')}>طلباتك</p>
+                  </div>
+                  <div className="space-y-3">
+                    <p className="text-orange-600 border-b pb-1">التبديل لـ</p>
+                    <button onClick={() => setUser({...user, role: 'Customer'})} className="block hover:text-blue-600">عميل</button>
+                    <button onClick={() => setUser({...user, role: 'Merchant'})} className="block hover:text-blue-600">تاجر</button>
+                    <button onClick={() => setUser({...user, role: 'Admin'})} className="block hover:text-blue-600">مدير</button>
+                  </div>
                 </div>
+                <button 
+                  onClick={() => setUser(null)}
+                  className="w-full mt-6 flex items-center justify-center gap-2 py-2 border-t text-red-600 hover:bg-red-50 font-black text-xs"
+                >
+                  <LogOut size={14} /> تسجيل الخروج
+                </button>
               </div>
-            </div>
+            )}
           </div>
 
           <div className="flex items-center gap-1 cursor-pointer hover:ring-1 hover:ring-white p-1 relative rounded" onClick={() => navigate('/cart')}>
@@ -122,13 +136,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser, cartCount, onS
         </div>
       </footer>
 
-      <a 
-        href="https://wa.me/201030417663" 
-        target="_blank" 
-        className="fixed bottom-6 left-6 z-50 bg-green-500 text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform"
-      >
-        <MessageCircle size={28} />
-      </a>
+      <a href="https://wa.me/201030417663" target="_blank" className="fixed bottom-6 left-6 z-50 bg-green-500 text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform"><MessageCircle size={28} /></a>
     </div>
   );
 };
